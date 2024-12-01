@@ -7,10 +7,15 @@ import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
+import { LambdaIamPolicies } from "./iam-policies";
+
+
 
 export class InventoryManagementStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+  
 
     // DynamoDB Table
     const table = new dynamodb.Table(this, "InventoryTable", {
@@ -19,11 +24,22 @@ export class InventoryManagementStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    
+    const tableName = "InventoryTable";
+    const firstLambdaName = "dataEntryLambda";
+    const secondLambdaName = "queryLambda";
+
+    const firstLambdaRole = LambdaIamPolicies.createFirstLambdaRole(this, tableName, firstLambdaName);
+    const secondLambdaRole = LambdaIamPolicies.createSecondLambdaRole(this, tableName, secondLambdaName);
+
+
+    
     // Data Entry Lambda
     const dataEntryLambda = new lambda.Function(this, "DataEntryLambda", {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset("lambda/data-entry/dist"),
       handler: "index.handler",
+      role: firstLambdaRole,
       environment: {
         TABLE_NAME: table.tableName,
       },
@@ -45,6 +61,7 @@ export class InventoryManagementStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset("lambda/query/dist"),
       handler: "index.handler",
+      role: secondLambdaRole,
       environment: {
         TABLE_NAME: table.tableName,
       },
@@ -55,5 +72,10 @@ export class InventoryManagementStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, "InventoryApi");
     const items = api.root.addResource("items");
     items.addMethod("POST", new apigateway.LambdaIntegration(queryLambda));
+
+
+
+
+    
   }
 }
