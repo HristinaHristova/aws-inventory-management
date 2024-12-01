@@ -21,7 +21,7 @@ export class InventoryManagementStack extends cdk.Stack {
 
     // Data Entry Lambda
     const dataEntryLambda = new lambda.Function(this, "DataEntryLambda", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset("lambda/data-entry/dist"),
       handler: "index.handler",
       environment: {
@@ -42,7 +42,7 @@ export class InventoryManagementStack extends cdk.Stack {
 
     // Query Lambda
     const queryLambda = new lambda.Function(this, "QueryLambda", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       code: lambda.Code.fromAsset("lambda/query/dist"),
       handler: "index.handler",
       environment: {
