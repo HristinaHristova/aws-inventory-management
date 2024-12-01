@@ -3,7 +3,7 @@ import { Construct } from "constructs";
 
 export class LambdaIamPolicies {
   public static createFirstLambdaRole(scope: Construct, tableName: string, lambdaFunctionName: string): iam.Role {
-    const role = new iam.Role(scope, "data-entry", {
+    const role = new iam.Role(scope, "dataEntryLambda", {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
@@ -37,7 +37,7 @@ export class LambdaIamPolicies {
   }
 
   public static createSecondLambdaRole(scope: Construct, tableName: string, lambdaFunctionName: string): iam.Role {
-    const role = new iam.Role(scope, "query", {
+    const role = new iam.Role(scope, "queryLambda", {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
     });
 
